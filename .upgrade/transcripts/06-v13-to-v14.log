@@ -1,0 +1,8 @@
+Hop 6 (Angular 13 → 14) is done.
+
+- `ng update @angular/core@14 @angular/cli@14` ran cleanly; migrations removed `defaultProject`, raised the TS target to ES2020, and applied the typed-forms opt-out (`UntypedFormBuilder`/`UntypedFormGroup` in `add-employee.component.ts`). No hand fixes were needed.
+- NgRx bumped 13.2 → 14.3.3 to satisfy Angular 14 peers.
+- Verified from a clean `node_modules` with strict peer resolution: `npm install` ✅, `npm run build` ✅, `npm run build:ssr` ✅.
+- `npm test` still fails with the exact pre-existing error from baseline (`angular.json` karma target points at `styles.css` instead of `src/styles.css`) — unchanged, not a regression.
+
+Report written to `.upgrade/reports/06-v13-to-v14.json`. No commit made, per the rules.

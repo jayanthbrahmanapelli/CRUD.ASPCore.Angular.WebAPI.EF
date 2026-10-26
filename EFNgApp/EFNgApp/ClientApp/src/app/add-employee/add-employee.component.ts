@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { UntypedFormBuilder, Validators, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EmployeeService } from '../services/employee.service';
 import { City } from 'src/models/city';
@@ -15,13 +15,13 @@ import { AddEmployee, EditEmployee } from '../state/actions/employee.actions';
 })
 export class AddEmployeeComponent implements OnInit {
 
-  employeeForm: FormGroup;
+  employeeForm: UntypedFormGroup;
   title = 'Create';
   employeeId: number;
   errorMessage: any;
   cityList: City[];
 
-  constructor(private _fb: FormBuilder, private _avRoute: ActivatedRoute,
+  constructor(private _fb: UntypedFormBuilder, private _avRoute: ActivatedRoute,
     private _employeeService: EmployeeService, private _router: Router,
     private store: Store<AppState>) {
     if (this._avRoute.snapshot.params['id']) {

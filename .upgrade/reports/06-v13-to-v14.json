@@ -1,0 +1,46 @@
+{
+  "hop": "06-v13-to-v14",
+  "status": "done",
+  "summary": "Upgraded the ClientApp from Angular 13.4 to Angular 14.3 with `ng update @angular/core@14 @angular/cli@14`, which ran all v14 migrations (removal of `defaultProject`, TypeScript target bumped to ES2020, and the typed-forms opt-out that rewrites FormBuilder/FormGroup to their Untyped* equivalents), and moved NgRx 13.2 -> 14.3 to match. No hand fixes were needed: the v14 breaking changes that touch this app (typed reactive forms and the strict `pathMatch` union) were fully handled by the migrations. A clean `npm install` with strict peer resolution, `npm run build` and `npm run build:ssr` all pass on Node 16; `npm test` still fails with the identical pre-existing angular.json misconfiguration it failed with at baseline.",
+  "changes": [
+    "Ran `npx -p @angular/cli@14 ng update @angular/core@14 @angular/cli@14 --allow-dirty --force`; all v14 CLI and core migrations executed.",
+    "angular.json: the migration removed the `defaultProject` option, which is deprecated in v14 (the project is now resolved from the working directory). Only one project exists and all scripts name their target explicitly, so behaviour is unchanged.",
+    "tsconfig.json: compilation target raised es2015 -> es2020 by the v14 migration. v14 drops IE entirely and all supported browsers handle ES2020.",
+    "src/app/add-employee/add-employee.component.ts: `FormBuilder`/`FormGroup` -> `UntypedFormBuilder`/`UntypedFormGroup`, applied by the typed-forms migration. v14 makes the forms model classes generic; the Untyped* aliases preserve the previous `any`-typed behaviour exactly, which is the behaviour-preserving choice for an upgrade.",
+    "The `pathMatch` migration (the property is a strict `'full'|'prefix'` union in v14) and the `entryComponents` migration both ran and found nothing to change.",
+    "Angular package version ranges were normalised from `~` to `^` by the CLI migration, as v14 scaffolds them.",
+    "Ran `ng update @ngrx/store@14`, moving all five @ngrx packages 13.2.0 -> 14.3.3 so their Angular ^14 peers are satisfied; the NgRx v14 migrations found nothing to change in the source.",
+    "TypeScript stayed at ~4.6.4, which is inside Angular 14.3's supported >=4.6 <4.9 range, so the CLI left it alone.",
+    "package-lock.json regenerated through npm; verified with `rm -rf node_modules && npm install` under default (strict) peer resolution, exit 0, followed by passing `npm run build` and `npm run build:ssr`."
+  ],
+  "dependencies": [
+    { "name": "@angular/animations", "from": "13.4.0", "to": "14.3.0" },
+    { "name": "@angular/common", "from": "13.4.0", "to": "14.3.0" },
+    { "name": "@angular/compiler", "from": "13.4.0", "to": "14.3.0" },
+    { "name": "@angular/core", "from": "13.4.0", "to": "14.3.0" },
+    { "name": "@angular/forms", "from": "13.4.0", "to": "14.3.0" },
+    { "name": "@angular/platform-browser", "from": "13.4.0", "to": "14.3.0" },
+    { "name": "@angular/platform-browser-dynamic", "from": "13.4.0", "to": "14.3.0" },
+    { "name": "@angular/platform-server", "from": "13.4.0", "to": "14.3.0" },
+    { "name": "@angular/router", "from": "13.4.0", "to": "14.3.0" },
+    { "name": "@angular/compiler-cli", "from": "^13.4.0", "to": "^14.3.0" },
+    { "name": "@angular/language-service", "from": "^13.4.0", "to": "^14.3.0" },
+    { "name": "@angular/cli", "from": "~13.3.11", "to": "^14.2.13" },
+    { "name": "@angular-devkit/build-angular", "from": "~13.3.11", "to": "^14.2.13" },
+    { "name": "@ngrx/store", "from": "^13.2.0", "to": "^14.3.3" },
+    { "name": "@ngrx/effects", "from": "^13.2.0", "to": "^14.3.3" },
+    { "name": "@ngrx/entity", "from": "^13.2.0", "to": "^14.3.3" },
+    { "name": "@ngrx/router-store", "from": "^13.2.0", "to": "^14.3.3" },
+    { "name": "@ngrx/store-devtools", "from": "^13.2.0", "to": "^14.3.3" }
+  ],
+  "manual_followups": [
+    "`npm test` fails at baseline and still fails with the identical cause: the karma target in angular.json lists `\"styles\": [\"styles.css\"]` instead of `\"src/styles.css\"`, so the builder cannot resolve the entry (ENOENT on ClientApp/styles.css). Pre-existing, not a regression, but it means the suite has never actually run, so none of the migrated code is covered by executed tests.",
+    "The typed-forms opt-out is a compatibility shim. `add-employee.component.ts` should eventually move back to the real `FormBuilder`/`FormGroup` to gain v14's static typing on the employee form.",
+    "`npm run lint` is still broken (the v13 migration deleted the tslint-based lint targets). tslint and codelyzer remain in optionalDependencies; replace with @angular-eslint or drop the `lint` script.",
+    "`src/test.ts` still sets `teardown: { destroyAfterEach: false }` from the v13 hop. Remove it once the test target is fixed.",
+    "SSR is still the legacy `main.server.ts` re-export of @angular/platform-server rather than the @nguniversal/express-engine layout; the build still warns about the 'domino' CommonJS bailout in the server bundle.",
+    "`\"defaultConfiguration\": \"\"` remains on the build and server targets (inherited from v12). Schema-valid, but worth setting deliberately.",
+    "node-sass 4.x (an optionalDependency) still fails to build on this image and is skipped; nothing uses Sass, so it blocks nothing, but it should be removed or replaced with `sass`.",
+    "core-js 2.6.5 is still a dependency, unmaintained and unimported since the v13 polyfills cleanup; likely removable."
+  ]
+}
