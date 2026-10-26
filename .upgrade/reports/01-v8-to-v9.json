@@ -1,0 +1,45 @@
+{
+  "hop": "01-v8-to-v9",
+  "status": "done",
+  "summary": "Upgraded the ClientApp from Angular 8.1 to Angular 9.1 using `ng update @angular/core@9 @angular/cli@9`, which also bumped TypeScript to 3.8, zone.js to 0.10 and rxjs to 6.6 and applied Angular's own v9 migrations (Ivy/AOT flags in angular.json, tsconfig files/include rewrites, server render re-exports in main.ts). @ngrx/* was bumped from 8.6.1 to 9.2.1 via `ng update` because ngrx 8 only peers on @angular/core ^8. install and build pass; the unit tests still fail for the same pre-existing angular.json misconfiguration that made them fail at baseline.",
+  "changes": [
+    "angular.json: build options gained `\"aot\": true` and the production config gained an `anyComponentStyle` budget (Angular v9 CLI migration).",
+    "src/tsconfig.app.json and src/tsconfig.server.json: `exclude` replaced with explicit `files`/`include` entries (Angular v9 migration).",
+    "src/main.ts: Angular's v9 migration appended `export { renderModule, renderModuleFactory } from '@angular/platform-server';` for the Universal server build.",
+    "@ngrx migration schematics 'The road to v9' ran for @ngrx/effects and @ngrx/router-store; they reported no source changes needed.",
+    "package.json and package-lock.json updated together through npm/ng update, so the lockfile is in sync.",
+    "No application source logic was changed; behaviour is unchanged."
+  ],
+  "dependencies": [
+    { "name": "@angular/animations", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/common", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/compiler", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/core", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/forms", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/platform-browser", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/platform-browser-dynamic", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/platform-server", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/router", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/cli", "from": "~8.1.0", "to": "~9.1.15" },
+    { "name": "@angular/compiler-cli", "from": "^8.1.0", "to": "^9.1.13" },
+    { "name": "@angular/language-service", "from": "^8.1.0", "to": "^9.1.13" },
+    { "name": "@angular-devkit/build-angular", "from": "~0.801.0", "to": "~0.901.15" },
+    { "name": "@ngrx/effects", "from": "^8.5.2", "to": "^9.2.1" },
+    { "name": "@ngrx/entity", "from": "^8.5.2", "to": "^9.2.1" },
+    { "name": "@ngrx/router-store", "from": "^8.5.2", "to": "^9.2.1" },
+    { "name": "@ngrx/store", "from": "^8.5.2", "to": "^9.2.1" },
+    { "name": "@ngrx/store-devtools", "from": "^8.5.2", "to": "^9.2.1" },
+    { "name": "typescript", "from": "~3.4.5", "to": "~3.8.3" },
+    { "name": "zone.js", "from": "~0.9.1", "to": "~0.10.2" },
+    { "name": "rxjs", "from": "^6.4.0", "to": "^6.6.7" },
+    { "name": "@types/node", "from": "~11.10.5", "to": "^12.11.1" },
+    { "name": "codelyzer", "from": "^5.0.1", "to": "^5.1.2" },
+    { "name": "tslib", "from": "(absent)", "to": "^1.10.0" }
+  ],
+  "manual_followups": [
+    "Unit tests still fail (as at baseline): angular.json's test target lists `\"styles\": [\"styles.css\"]` instead of `\"src/styles.css\"`, so webpack cannot resolve the entry and karma never runs a spec. This path was already wrong before the upgrade and was left untouched to keep the hop minimal; fixing it is a one-line change that would let the suite actually execute.",
+    "`@nguniversal/module-map-ngfactory-loader` is still pinned at 7.1.0 and emits an Angular 7 peer warning. It is deprecated from Angular 9 onward (Ivy makes it unnecessary); the SSR entry `src/app/app.server.module.ts` still imports `ModuleMapLoaderModule`. The browser build is unaffected, but `npm run build:ssr` was not part of the required checks and was not verified.",
+    "Ivy is enabled by default in Angular 9 (`aot: true` was added to the build options). A manual smoke test of the running app is worth doing, since Ivy can surface runtime differences that a successful compile does not catch.",
+    "The optional dependency `node-sass@4.11.0` fails to compile on Node 12 in this environment (node-gyp cannot find a Python 2). It is optional so `npm install` still succeeds, exactly as at baseline, but it should be replaced with `sass` in a later hop."
+  ]
+}
