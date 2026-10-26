@@ -1,0 +1,13 @@
+Hop 12 done — Angular 19.2 → 20.3.
+
+**What changed** (all inside `EFNgApp/EFNgApp/ClientApp`):
+- Angular packages `19.2.25` → `20.3.34`, CLI/build-angular `^19.2.27` → `^20.3.41`. TypeScript and zone.js were already in range.
+- `tsconfig.json`: `moduleResolution` `node` → `bundler` (CLI migration).
+- `angular.json`: migration added a `schematics` block pinning pre-v20 generation naming — affects only future `ng generate`, no files renamed.
+- `employee.service.spec.ts`: `TestBed.get` → `TestBed.inject` (`get` removed in v20).
+- `@ngrx/*` `^19.2.1` → `^20.1.0` — not in the hop file, but NgRx 19 peers on `@angular/core@^19`. Its schematic runner crashed mid-run (same `@angular-devkit/core` failure as the last hop), so its migrations didn't run; nothing in the app uses an API NgRx 20 changed.
+- Declined the three optional migrations (`use-application-builder`, `control-flow-migration`, `router-current-navigation`).
+
+**Checks:** `npm install` pass (clean from-scratch, no `--force`/`--legacy-peer-deps`), `npm run build` pass, `npm run build:ssr` pass. `npm run test` still fails on the pre-existing `Can't resolve 'styles.css'` in the angular.json test target — identical to baseline, not worsened.
+
+Report written to `.upgrade/reports/12-v19-to-v20.json`. Flagged for the next hop: rxjs is still 6.6.7 (Angular 21 is expected to require 7), and the app is still on the deprecated `browser`/`server` builders.
