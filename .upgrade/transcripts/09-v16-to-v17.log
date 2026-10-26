@@ -1,0 +1,9 @@
+Hop 9 is done. Angular 16.2 → 17.3 in `EFNgApp/EFNgApp/ClientApp`:
+
+- `ng update @angular/core@17 @angular/cli@17` bumped all Angular packages to 17.3.12, CLI/build-angular to 17.3.17, TypeScript 4.9.5 → 5.4.5, zone.js 0.13.3 → 0.14.10.
+- `ng update @ngrx/store@17` moved all five `@ngrx/*` packages 16.3.0 → 17.2.0.
+- Migrations made two code changes: `browserTarget` → `buildTarget` in `angular.json` (serve, extract-i18n), and `connectInZone: true` added to `StoreDevtoolsModule.instrument()` in `src/app/app.module.ts`. I only reindented the latter — no other hand fixes were needed.
+
+Checks: `npm install` pass, `npm run build` pass, `npm run build:ssr` pass. `npm run test` still fails with the identical pre-existing error as at baseline (`Can't resolve 'styles.css'` — the test target's stylesheet path is missing the `src/` prefix), so it's no worse than baseline.
+
+Report written to `.upgrade/reports/09-v16-to-v17.json`, with followups noted for the styles.css path, the still-pending rxjs 7 bump (required by Angular 18), and the legacy builder/NgModule setup. No commit made, per the rules.

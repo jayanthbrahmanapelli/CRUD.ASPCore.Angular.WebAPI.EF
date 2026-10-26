@@ -62,18 +62,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "EFNgApp:build"
+            "buildTarget": "EFNgApp:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "EFNgApp:build:production"
+              "buildTarget": "EFNgApp:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "EFNgApp:build"
+            "buildTarget": "EFNgApp:build"
           }
         },
         "test": {

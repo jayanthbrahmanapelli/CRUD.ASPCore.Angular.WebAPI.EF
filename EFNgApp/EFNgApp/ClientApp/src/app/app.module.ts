@@ -38,7 +38,8 @@ import * as fromEmployee from 'src/app/state/reducers/employee.reducer';
     }),
     EffectsModule.forRoot([EmployeeEffect]),
     StoreDevtoolsModule.instrument({
-      maxAge: 25
+      maxAge: 25,
+      connectInZone: true
     }),
     RouterModule.forRoot([
     { path: '', component: HomeComponent, pathMatch: 'full' },
