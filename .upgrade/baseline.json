@@ -1,0 +1,6 @@
+{
+  "node": "12",
+  "install": "pass",
+  "build": "pass",
+  "test": "fail"
+}
