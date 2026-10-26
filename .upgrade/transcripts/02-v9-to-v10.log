@@ -1,0 +1,10 @@
+Hop 2 done — Angular 9.1 → 10.2.
+
+**Checks** (from `ClientApp`, Node 12):
+- `npm install` — pass (verified from a clean `node_modules`)
+- `npm run build` — pass
+- `npm test` — fail, identical to baseline: the karma target in `angular.json` points at `styles.css` instead of `src/styles.css`, so webpack can't resolve the entry. Pre-existing, not a regression.
+
+**What changed:** `ng update @angular/core@10 @angular/cli@10` carried the Angular packages to 10.2.5, TypeScript to 4.0, tslib to 2.x, and the karma/jasmine/protractor/tslint tooling to v10 baselines, running all v10 migrations (`angular.json` `vendorChunk` removal, `browserslist` → `.browserslistrc`, `module: es2020`, server tsconfig `target: es2016`, tslint rule removal). Beyond that I bumped NgRx 9.2 → 10.1 and codelyzer 5 → 6, both of which peer-restrict to Angular 9 — that left no peer warnings except the pre-existing `@nguniversal/module-map-ngfactory-loader@7.1.0`.
+
+One snag worth knowing for later hops: the local CLI's `ng update` self-upgrades to the *latest* stable CLI, which refuses to run on Node 12. I ran it as `NG_DISABLE_VERSION_CHECK=1` against a CLI 10 installed in `/tmp`. Report written to `.upgrade/reports/02-v9-to-v10.json`; no commits made.
