@@ -1,0 +1,11 @@
+Hop 10 (Angular 17 → 18) is done. Report written to `.upgrade/reports/10-v17-to-v18.json`.
+
+**What happened:**
+
+- `ng update @angular/core@18 @angular/cli@18` moved Angular to 18.2.14 and the CLI/devkit to 18.2.21. Its migration swapped the deprecated `HttpClientModule` for `provideHttpClient(withInterceptorsFromDi())`, which preserves the app's existing DI-registered `HTTP_INTERCEPTORS`.
+- The hop file said no related packages needed moving, but that was wrong: `@ngrx/*` 17 declares a peer of `@angular/core@^17.0.0`, so a clean `npm install` died with ERESOLVE. Bumped NgRx to 18.1.1 with `ng update @ngrx/store@18`.
+- Two migration outputs needed hand fixing. The NgRx `TypedAction`→`Action` migration left *both* the new and the old deep `@ngrx/store/src/models` import in `employee.reducer.ts`, which is a duplicate-identifier error — removed the stale line. The Angular migration also reflowed the whole `@NgModule` decorator; reindented it so the diff shows only the real change.
+- Dropped `@ngrx/operators`, which the NgRx migration adds unconditionally for `concatLatestFrom` — not used anywhere in `src/`.
+- Declined the optional `use-application-builder` migration, keeping the current `browser` builder and aspnet-prerendering SSR.
+
+**Checks** (from `ClientApp`): install passes from a scratch `node_modules` with no `--force`/`--legacy-peer-deps`; `build` and `build:ssr` pass; `test` still fails. The test failure is the baseline one, unchanged — `angular.json`'s test target points at `styles.css` instead of `src/styles.css`, so Karma aborts before any spec runs. Per the hop rules I left it, but it's a one-line fix that would unblock the suite, and it's flagged as a follow-up along with the still-pending rxjs 7 bump (rxjs 6 is EOL and Angular 19 narrows the peer range).
