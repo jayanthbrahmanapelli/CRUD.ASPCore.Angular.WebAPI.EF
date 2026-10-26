@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { APP_ID, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
@@ -29,7 +29,7 @@ import * as fromEmployee from 'src/app/state/reducers/employee.reducer';
     AddEmployeeComponent
   ],
   imports: [
-    BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
+    BrowserModule,
     FormsModule,
     ReactiveFormsModule,
     StoreModule.forRoot({
@@ -49,7 +49,10 @@ import * as fromEmployee from 'src/app/state/reducers/employee.reducer';
     { path: 'employee/edit/:id', component: AddEmployeeComponent },
 ], {})
   ],
-  providers: [provideHttpClient(withInterceptorsFromDi())],
+  providers: [
+    { provide: APP_ID, useValue: 'ng-cli-universal' },
+    provideHttpClient(withInterceptorsFromDi())
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
