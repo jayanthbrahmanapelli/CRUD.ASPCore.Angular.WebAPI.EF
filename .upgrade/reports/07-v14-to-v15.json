@@ -1,0 +1,26 @@
+{
+  "hop": "07-v14-to-v15",
+  "status": "done",
+  "summary": "Upgraded the ClientApp from Angular 14.3 to Angular 15.2 using `ng update @angular/core@15 @angular/cli@15`, and bumped @ngrx/* from 14 to 15 to match. Angular's own migrations handled the removal of `relativeLinkResolution`, the `renderModule` re-export in main.server.ts, the obsolete `require.context` block in test.ts, and the tsconfig target/useDefineForClassFields change. `npm install` and `npm run build` pass; `npm run test` still fails for the same pre-existing reason as at baseline.",
+  "changes": [
+    "Angular packages 14.3.0 -> 15.2.10; CLI/build-angular -> 15.2.11; typescript ~4.6.4 -> ~4.9.5.",
+    "@ngrx/{store,effects,entity,router-store,store-devtools} ^14.3.3 -> ^15.4.0 via `ng update @ngrx/store@15`.",
+    "src/app/app.module.ts: removed the deprecated `relativeLinkResolution: 'legacy'` router option (migration).",
+    "src/main.server.ts: dropped the `renderModule` re-export, now provided by the CLI (migration).",
+    "src/test.ts: removed the `require.context` test loader, no longer needed by the Karma builder (migration).",
+    "tsconfig.json: target ES2022 + `useDefineForClassFields: false`; src/tsconfig.server.json: dropped its `target` override (migration).",
+    "Regenerated package-lock.json: the lockfile produced during `ng update` was missing the root `webpack` entry, which broke `ng build` with \"Cannot find module 'webpack'\"."
+  ],
+  "dependencies": [
+    { "name": "@angular/core", "from": "14.3.0", "to": "15.2.10" },
+    { "name": "@angular/cli", "from": "^14.2.13", "to": "^15.2.11" },
+    { "name": "@angular-devkit/build-angular", "from": "^14.2.13", "to": "^15.2.11" },
+    { "name": "@ngrx/store", "from": "^14.3.3", "to": "^15.4.0" },
+    { "name": "typescript", "from": "~4.6.4", "to": "~4.9.5" }
+  ],
+  "manual_followups": [
+    "Tests still fail (as at baseline) because the `test` target in angular.json lists the stylesheet as \"styles.css\" instead of \"src/styles.css\", so Karma aborts with \"Can't resolve 'styles.css'\". Fixing that path is outside this hop but would let the suite run.",
+    "src/main.server.ts still exports `renderModuleFactory`, which is removed in Angular 16 - it will need replacing with `renderModule` in a later hop.",
+    "Deprecated/legacy devDeps remain (tslint, codelyzer, protractor, node-sass, core-js 2, @types/node 12); they are unused by the required checks but should be retired."
+  ]
+}

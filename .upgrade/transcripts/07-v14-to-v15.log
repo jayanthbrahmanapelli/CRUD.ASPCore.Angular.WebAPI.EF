@@ -1,0 +1,7 @@
+Hop 7 complete.
+
+- **Upgrade**: Angular 14.3 → 15.2.10 (CLI/build-angular 15.2.11, TypeScript 4.9.5), plus @ngrx/* 14 → 15.4.0.
+- **Migrations applied automatically**: `relativeLinkResolution` removed from the router config, `renderModule` re-export dropped from `main.server.ts`, `require.context` loader removed from `test.ts`, tsconfig `target: ES2022` + `useDefineForClassFields: false`.
+- **One manual fix**: the lockfile written during `ng update` was missing the root `webpack` entry, so `ng build` failed with `Cannot find module 'webpack'`. Regenerated `package-lock.json` from a clean install, which resolved it.
+
+Checks: `npm install` pass, `npm run build` pass. `npm run test` still fails — same pre-existing cause as baseline (`angular.json` test target references `styles.css` instead of `src/styles.css`), not a regression from this hop. Report written to `.upgrade/reports/07-v14-to-v15.json`. No commits made.

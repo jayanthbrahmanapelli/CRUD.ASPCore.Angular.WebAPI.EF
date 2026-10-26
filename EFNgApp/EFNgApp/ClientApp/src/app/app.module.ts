@@ -47,7 +47,7 @@ import * as fromEmployee from 'src/app/state/reducers/employee.reducer';
     { path: 'fetch-employee', component: FetchEmployeeComponent },
     { path: 'register-employee', component: AddEmployeeComponent },
     { path: 'employee/edit/:id', component: AddEmployeeComponent },
-], { relativeLinkResolution: 'legacy' })
+], {})
   ],
   providers: [],
   bootstrap: [AppComponent]
