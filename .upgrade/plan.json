@@ -1,0 +1,237 @@
+{
+  "framework": "angular",
+  "framework_label": "Angular",
+  "app_path": "EFNgApp/EFNgApp/ClientApp",
+  "package_manager": "npm",
+  "from_version": 8,
+  "to_version": 21,
+  "baseline_node": 12,
+  "verify": {
+    "install": "npm install",
+    "build": "npm run build",
+    "test": "npm run test -- --watch=false --browsers=ChromeHeadless"
+  },
+  "hops": [
+    {
+      "index": 1,
+      "from_version": 8,
+      "to_version": 9,
+      "node": 12,
+      "commands": [
+        "npx -y -p @angular/cli@9 ng update @angular/core@9 @angular/cli@9 --allow-dirty --force"
+      ],
+      "guide_url": "https://angular.dev/update-guide?v=8.0-9.0&l=3",
+      "notes": [
+        "Run the update command first: it applies Angular's own migrations. Only then fix what is left by hand.",
+        "If install fails on peer dependencies, retry with --legacy-peer-deps (npm 7+) before changing versions.",
+        "Third-party Angular libraries usually need their own major bump to match; pick the release that supports this Angular version."
+      ],
+      "companions": [],
+      "slug": "01-v8-to-v9"
+    },
+    {
+      "index": 2,
+      "from_version": 9,
+      "to_version": 10,
+      "node": 12,
+      "commands": [
+        "npx -y -p @angular/cli@10 ng update @angular/core@10 @angular/cli@10 --allow-dirty --force"
+      ],
+      "guide_url": "https://angular.dev/update-guide?v=9.0-10.0&l=3",
+      "notes": [
+        "Run the update command first: it applies Angular's own migrations. Only then fix what is left by hand.",
+        "If install fails on peer dependencies, retry with --legacy-peer-deps (npm 7+) before changing versions.",
+        "Third-party Angular libraries usually need their own major bump to match; pick the release that supports this Angular version."
+      ],
+      "companions": [],
+      "slug": "02-v9-to-v10"
+    },
+    {
+      "index": 3,
+      "from_version": 10,
+      "to_version": 11,
+      "node": 12,
+      "commands": [
+        "npx -y -p @angular/cli@11 ng update @angular/core@11 @angular/cli@11 --allow-dirty --force"
+      ],
+      "guide_url": "https://angular.dev/update-guide?v=10.0-11.0&l=3",
+      "notes": [
+        "Run the update command first: it applies Angular's own migrations. Only then fix what is left by hand.",
+        "If install fails on peer dependencies, retry with --legacy-peer-deps (npm 7+) before changing versions.",
+        "Third-party Angular libraries usually need their own major bump to match; pick the release that supports this Angular version."
+      ],
+      "companions": [],
+      "slug": "03-v10-to-v11"
+    },
+    {
+      "index": 4,
+      "from_version": 11,
+      "to_version": 12,
+      "node": 14,
+      "commands": [
+        "npx -y -p @angular/cli@12 ng update @angular/core@12 @angular/cli@12 --allow-dirty --force"
+      ],
+      "guide_url": "https://angular.dev/update-guide?v=11.0-12.0&l=3",
+      "notes": [
+        "Run the update command first: it applies Angular's own migrations. Only then fix what is left by hand.",
+        "If install fails on peer dependencies, retry with --legacy-peer-deps (npm 7+) before changing versions.",
+        "Third-party Angular libraries usually need their own major bump to match; pick the release that supports this Angular version."
+      ],
+      "companions": [],
+      "slug": "04-v11-to-v12"
+    },
+    {
+      "index": 5,
+      "from_version": 12,
+      "to_version": 13,
+      "node": 16,
+      "commands": [
+        "npx -y -p @angular/cli@13 ng update @angular/core@13 @angular/cli@13 --allow-dirty --force"
+      ],
+      "guide_url": "https://angular.dev/update-guide?v=12.0-13.0&l=3",
+      "notes": [
+        "Run the update command first: it applies Angular's own migrations. Only then fix what is left by hand.",
+        "If install fails on peer dependencies, retry with --legacy-peer-deps (npm 7+) before changing versions.",
+        "Third-party Angular libraries usually need their own major bump to match; pick the release that supports this Angular version."
+      ],
+      "companions": [],
+      "slug": "05-v12-to-v13"
+    },
+    {
+      "index": 6,
+      "from_version": 13,
+      "to_version": 14,
+      "node": 16,
+      "commands": [
+        "npx -y -p @angular/cli@14 ng update @angular/core@14 @angular/cli@14 --allow-dirty --force"
+      ],
+      "guide_url": "https://angular.dev/update-guide?v=13.0-14.0&l=3",
+      "notes": [
+        "Run the update command first: it applies Angular's own migrations. Only then fix what is left by hand.",
+        "If install fails on peer dependencies, retry with --legacy-peer-deps (npm 7+) before changing versions.",
+        "Third-party Angular libraries usually need their own major bump to match; pick the release that supports this Angular version."
+      ],
+      "companions": [],
+      "slug": "06-v13-to-v14"
+    },
+    {
+      "index": 7,
+      "from_version": 14,
+      "to_version": 15,
+      "node": 18,
+      "commands": [
+        "npx -y -p @angular/cli@15 ng update @angular/core@15 @angular/cli@15 --allow-dirty --force"
+      ],
+      "guide_url": "https://angular.dev/update-guide?v=14.0-15.0&l=3",
+      "notes": [
+        "Run the update command first: it applies Angular's own migrations. Only then fix what is left by hand.",
+        "If install fails on peer dependencies, retry with --legacy-peer-deps (npm 7+) before changing versions.",
+        "Third-party Angular libraries usually need their own major bump to match; pick the release that supports this Angular version."
+      ],
+      "companions": [],
+      "slug": "07-v14-to-v15"
+    },
+    {
+      "index": 8,
+      "from_version": 15,
+      "to_version": 16,
+      "node": 18,
+      "commands": [
+        "npx -y -p @angular/cli@16 ng update @angular/core@16 @angular/cli@16 --allow-dirty --force"
+      ],
+      "guide_url": "https://angular.dev/update-guide?v=15.0-16.0&l=3",
+      "notes": [
+        "Run the update command first: it applies Angular's own migrations. Only then fix what is left by hand.",
+        "If install fails on peer dependencies, retry with --legacy-peer-deps (npm 7+) before changing versions.",
+        "Third-party Angular libraries usually need their own major bump to match; pick the release that supports this Angular version."
+      ],
+      "companions": [],
+      "slug": "08-v15-to-v16"
+    },
+    {
+      "index": 9,
+      "from_version": 16,
+      "to_version": 17,
+      "node": 20,
+      "commands": [
+        "npx -y -p @angular/cli@17 ng update @angular/core@17 @angular/cli@17 --allow-dirty --force"
+      ],
+      "guide_url": "https://angular.dev/update-guide?v=16.0-17.0&l=3",
+      "notes": [
+        "Run the update command first: it applies Angular's own migrations. Only then fix what is left by hand.",
+        "If install fails on peer dependencies, retry with --legacy-peer-deps (npm 7+) before changing versions.",
+        "Third-party Angular libraries usually need their own major bump to match; pick the release that supports this Angular version."
+      ],
+      "companions": [],
+      "slug": "09-v16-to-v17"
+    },
+    {
+      "index": 10,
+      "from_version": 17,
+      "to_version": 18,
+      "node": 20,
+      "commands": [
+        "npx -y -p @angular/cli@18 ng update @angular/core@18 @angular/cli@18 --allow-dirty --force"
+      ],
+      "guide_url": "https://angular.dev/update-guide?v=17.0-18.0&l=3",
+      "notes": [
+        "Run the update command first: it applies Angular's own migrations. Only then fix what is left by hand.",
+        "If install fails on peer dependencies, retry with --legacy-peer-deps (npm 7+) before changing versions.",
+        "Third-party Angular libraries usually need their own major bump to match; pick the release that supports this Angular version."
+      ],
+      "companions": [],
+      "slug": "10-v17-to-v18"
+    },
+    {
+      "index": 11,
+      "from_version": 18,
+      "to_version": 19,
+      "node": 20,
+      "commands": [
+        "npx -y -p @angular/cli@19 ng update @angular/core@19 @angular/cli@19 --allow-dirty --force"
+      ],
+      "guide_url": "https://angular.dev/update-guide?v=18.0-19.0&l=3",
+      "notes": [
+        "Run the update command first: it applies Angular's own migrations. Only then fix what is left by hand.",
+        "If install fails on peer dependencies, retry with --legacy-peer-deps (npm 7+) before changing versions.",
+        "Third-party Angular libraries usually need their own major bump to match; pick the release that supports this Angular version."
+      ],
+      "companions": [],
+      "slug": "11-v18-to-v19"
+    },
+    {
+      "index": 12,
+      "from_version": 19,
+      "to_version": 20,
+      "node": 22,
+      "commands": [
+        "npx -y -p @angular/cli@20 ng update @angular/core@20 @angular/cli@20 --allow-dirty --force"
+      ],
+      "guide_url": "https://angular.dev/update-guide?v=19.0-20.0&l=3",
+      "notes": [
+        "Run the update command first: it applies Angular's own migrations. Only then fix what is left by hand.",
+        "If install fails on peer dependencies, retry with --legacy-peer-deps (npm 7+) before changing versions.",
+        "Third-party Angular libraries usually need their own major bump to match; pick the release that supports this Angular version."
+      ],
+      "companions": [],
+      "slug": "12-v19-to-v20"
+    },
+    {
+      "index": 13,
+      "from_version": 20,
+      "to_version": 21,
+      "node": 22,
+      "commands": [
+        "npx -y -p @angular/cli@21 ng update @angular/core@21 @angular/cli@21 --allow-dirty --force"
+      ],
+      "guide_url": "https://angular.dev/update-guide?v=20.0-21.0&l=3",
+      "notes": [
+        "Run the update command first: it applies Angular's own migrations. Only then fix what is left by hand.",
+        "If install fails on peer dependencies, retry with --legacy-peer-deps (npm 7+) before changing versions.",
+        "Third-party Angular libraries usually need their own major bump to match; pick the release that supports this Angular version."
+      ],
+      "companions": [],
+      "slug": "13-v20-to-v21"
+    }
+  ]
+}
