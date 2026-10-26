@@ -1,0 +1,15 @@
+Hop complete. Angular 8.1 → 9.1.13 in `EFNgApp/EFNgApp/ClientApp`.
+
+**What I did**
+- `ng update @angular/core@9 @angular/cli@9` applied Angular's own v9 migrations: `aot: true` + an `anyComponentStyle` budget in `angular.json`, `files`/`include` rewrites in `src/tsconfig.app.json` and `src/tsconfig.server.json`, and the `renderModule`/`renderModuleFactory` re-export appended to `src/main.ts`. It also pulled TypeScript to 3.8, zone.js to 0.10, rxjs to 6.6 and added `tslib`.
+- The hop file said no related packages were detected, but `@ngrx/*` 8.6.1 peers only on `@angular/core ^8`, so I bumped the five `@ngrx` packages to 9.2.1 via `ng update` (its "road to v9" schematics ran and needed no source edits).
+- No application logic changed.
+
+Two environment notes: npm 6's `npx -p @angular/cli@9` mis-parses the scoped name ("command not found: cli"), so I installed CLI 9 into a temp dir; and CLI 9's `ng update` tries to fetch the latest CLI, which refuses Node 12, so the ngrx update ran with `NG_DISABLE_VERSION_CHECK=1`.
+
+**Checks** (run from `ClientApp`, after `rm -rf node_modules`)
+- install: **pass** (`node-sass` is an optionalDependency and fails to build here for lack of Python 2 — same as baseline, exit 0)
+- build: **pass**
+- test: **fail — unchanged from baseline.** The test target in `angular.json` lists `"styles": ["styles.css"]` rather than `"src/styles.css"`, so webpack can't resolve the entry and karma never reaches a spec. That path is untouched by this hop (confirmed in the diff) and the baseline recorded `"test": "fail"`, so I left it alone per the "smallest correct change" rule and flagged it as a followup — it's a one-line fix that would let the suite actually run.
+
+Report written to `.upgrade/reports/01-v8-to-v9.json` with the full dependency table and followups (the test config, the deprecated `@nguniversal/module-map-ngfactory-loader@7.1.0` still used by `app.server.module.ts`, an Ivy smoke test, and replacing node-sass). I did not commit, per the rules.
