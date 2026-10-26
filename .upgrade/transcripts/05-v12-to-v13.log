@@ -1,0 +1,16 @@
+Hop 5 is done. Angular 12.2 → 13.4 in `EFNgApp/EFNgApp/ClientApp`.
+
+**Checks (Node 16):**
+- `npm install` (clean, strict peers) — **pass**
+- `npm run build` — **pass** (`npm run build:ssr` also passes)
+- `npm test` — **fail**, same as baseline, same cause (`angular.json` karma target points at `styles.css` instead of `src/styles.css`). Not a regression.
+
+**Beyond what `ng update` handled automatically**, three things needed hand work:
+
+1. **webpack 5 dropped Node core-module polyfills.** `src/main.ts` re-exported `renderModule` from `@angular/platform-server`, so the *browser* build died on `Can't resolve 'url'`. Split the SSR re-export into a new `src/main.server.ts` and pointed the `server` target and `tsconfig.server.json` at it. The server bundle still emits the same `dist-server/main.<hash>.js` with the same exports, so the ASP.NET prerendering contract is unchanged.
+2. **npm 8 strict peers.** `@nguniversal/module-map-ngfactory-loader@7.1.0` (Angular ^7 peers) made `npm install` fail outright — removed it and dropped `ModuleMapLoaderModule` from `app.server.module.ts`; it's a no-op under Ivy. Also bumped `jasmine-core`/`@types/jasmine` to ~3.10 for `karma-jasmine-html-reporter`'s `>=3.8` peer.
+3. **`tsconfig.server.json` lacked `"types": []`**, so the SSR build typechecked every `@types` package in `node_modules` and broke on `@types/ws`.
+
+One thing worth flagging: the v13 CLI migration **deleted both `lint` targets** from `angular.json` (the tslint builder was removed in v13), so `npm run lint` no longer works. tslint/codelyzer are still in `optionalDependencies`. That's Angular's own migration, not something I chose, but it needs an `@angular-eslint` migration at some point.
+
+Report written to `.upgrade/reports/05-v12-to-v13.json` with the full change list and 9 follow-ups. No commits made.
