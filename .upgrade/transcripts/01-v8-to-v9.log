@@ -1,0 +1,13 @@
+Hop 1 is done.
+
+**What happened**
+- `ng update @angular/core@9 @angular/cli@9` ran cleanly (I had to use a locally installed CLI 9 with `NG_DISABLE_VERSION_CHECK=1` — the `npx` form in the hop file pulls the *latest* CLI, which refuses to run on Node 12). All six v9 core migrations ran; they needed no source edits.
+- The CLI migration touched `angular.json` (`aot: true`, component-style budget), both `tsconfig.app.json`/`tsconfig.server.json` (v9 `files`/`include` form), and added the `renderModule` export to `src/main.ts` (that file is the SSR `server` target's entry).
+- NgRx 8.6 → 9.2 via its own `ng update` — the hop file said "none detected", but NgRx 8 only peers with Angular 8, so it was required.
+
+**Checks** (from `ClientApp`)
+- `npm install` — pass (verified from a clean `node_modules`)
+- `npm run build` — pass
+- `npm test` — fail, unchanged from baseline: the karma target in `angular.json` points at `styles.css` instead of `src/styles.css`, a pre-existing config bug untouched by this hop. Not a regression, so I left it per the rules and flagged it.
+
+Report written to `.upgrade/reports/01-v8-to-v9.json`, including followups for that test config, the deprecated `@nguniversal/module-map-ngfactory-loader@7.1.0`, and the unbuildable optional `node-sass`. No commits made.
