@@ -2,34 +2,38 @@
 
 <p>This component demonstrates fetching Employee data from the server.</p>
 
-<p *ngIf="loading$ | async"><em>Loading...</em></p>
+@if (loading$ | async) {
+  <p><em>Loading...</em></p>
+}
 
 <p>
-    <a [routerLink]="['/register-employee']">Create New</a>
+  <a [routerLink]="['/register-employee']">Create New</a>
 </p>
 
 <table class='table'>
-    <thead>
-        <tr>
-            <th>EmployeeId</th>
-            <th>Name</th>
-            <th>Gender</th>
-            <th>Department</th>
-            <th>City</th>
+  <thead>
+    <tr>
+      <th>EmployeeId</th>
+      <th>Name</th>
+      <th>Gender</th>
+      <th>Department</th>
+      <th>City</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (emp of empList | async; track emp) {
+      <tr>
+        <td>{{ emp.employeeId }}</td>
+        <td>{{ emp.name }}</td>
+        <td>{{ emp.gender }}</td>
+        <td>{{ emp.department }}</td>
+        <td>{{ emp.city }}</td>
+        <td>
+          <td>
+            <a [routerLink]="['/employee/edit/', emp.employeeId]">Edit</a> |
+            <a [routerLink]="[]" (click)="delete(emp.employeeId)">Delete</a>
+          </td>
         </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let emp of empList | async">
-            <td>{{ emp.employeeId }}</td>
-            <td>{{ emp.name }}</td>
-            <td>{{ emp.gender }}</td>
-            <td>{{ emp.department }}</td>
-            <td>{{ emp.city }}</td>
-            <td>
-            <td>
-                <a [routerLink]="['/employee/edit/', emp.employeeId]">Edit</a> |
-                <a [routerLink]="[]" (click)="delete(emp.employeeId)">Delete</a>
-            </td>
-        </tr>
+      }
     </tbody>
-</table>
+  </table>

@@ -1,0 +1,48 @@
+{
+  "hop": "13-v20-to-v21",
+  "status": "done",
+  "summary": "Upgraded the ClientApp from Angular 20.3 to Angular 21.2 with `ng update @angular/core@21 @angular/cli@21`. The CLI rewrote package.json but its own install step failed, so the install and the schematics were run separately: npm needed a regenerated lockfile (and one --legacy-peer-deps pass) because @ngrx 20 pins @angular/core ^20, which the hop file had not flagged; @ngrx was bumped to 21.1.1. Angular's required migrations converted the three templates that used *ngIf/*ngFor to block control flow and added an explicit `provideZoneChangeDetection()` to the bootstrap call. `npm install`, `npm run build` and `npm run build:ssr` pass from a clean node_modules with no npm flags; `npm run test` still fails for the same pre-existing reason as at baseline.",
+  "changes": [
+    "Angular packages 20.3.34 -> 21.2.25; @angular/cli and @angular-devkit/build-angular ^20.3.41 -> ^21.2.28; @angular/compiler-cli and @angular/language-service ^20.3.34 -> ^21.2.25. The CLI also moved typescript ~5.8.3 -> ~5.9.3 (Angular 21's supported range). zone.js (~0.15.1) and rxjs (^6.6.7) are both still inside the Angular 21 peer ranges (`rxjs: ^6.5.3 || ^7.4.0`), so they were left alone; the rxjs 7 bump expected in the previous hop's notes is not required yet.",
+    "@ngrx/{store,effects,entity,router-store,store-devtools} ^20.1.0 -> ^21.1.1. The hop file listed no related packages, but NgRx 20 declares a peer of @angular/core ^20.0.0 and blocked the install. NgRx 21 keeps the same peer range for rxjs 6, and the app only uses APIs unchanged across the major (StoreModule.forRoot/EffectsModule.forRoot registration, createReducer/createAction, @ngrx/entity adapters); the build confirms it.",
+    "src/main.ts: the required `Migrates deprecated bootstrap options to providers` migration changed `platformBrowserDynamic(providers).bootstrapModule(AppModule)` to pass `{ applicationProviders: [provideZoneChangeDetection()] }`. Angular 21 no longer installs ZoneJS change detection implicitly, so this keeps the app's existing zone-based behaviour rather than switching it to zoneless.",
+    "src/app/add-employee/add-employee.component.html, src/app/fetch-employee/fetch-employee.component.html, src/app/fetch-data/fetch-data.component.html: the control-flow migration (required, not optional, in v21) rewrote every `*ngIf`/`*ngFor` as `@if`/`@for`. `@for` blocks got `track <item>` (identity tracking), which matches the previous NgForOf default of no trackBy. The migration also reindented those files. The pre-existing malformed markup in fetch-employee.component.html (a stray nested, unclosed `<td>` in the row template) was carried over unchanged and still renders as before.",
+    "Declined the one optional migration, `router-current-navigation`, per the smallest-correct-change rule: there is no `Router.getCurrentNavigation` usage in src/. The required `BootstrapContext`, `ApplicationConfig` import and `Router.lastSuccessfulNavigation` migrations all reported no changes.",
+    "angular.json was not touched: the project still uses the `browser`/`server` builders and the aspnet-prerendering SSR setup, and both still work on Angular 21.",
+    "package-lock.json regenerated. `ng update`'s bundled install and the first `npm install` both failed (ERESOLVE on the NgRx peer, then an npm arborist `Cannot read properties of null (reading 'edgesOut')` crash on the stale lock), so the lock was regenerated with a single `npm install --legacy-peer-deps` after bumping NgRx. Verified afterwards with `rm -rf node_modules && npm install` with no flags, followed by a clean `npm run build` and `npm run build:ssr`."
+  ],
+  "dependencies": [
+    { "name": "@angular/core", "from": "20.3.34", "to": "21.2.25" },
+    { "name": "@angular/animations", "from": "20.3.34", "to": "21.2.25" },
+    { "name": "@angular/common", "from": "20.3.34", "to": "21.2.25" },
+    { "name": "@angular/compiler", "from": "20.3.34", "to": "21.2.25" },
+    { "name": "@angular/forms", "from": "20.3.34", "to": "21.2.25" },
+    { "name": "@angular/platform-browser", "from": "20.3.34", "to": "21.2.25" },
+    { "name": "@angular/platform-browser-dynamic", "from": "20.3.34", "to": "21.2.25" },
+    { "name": "@angular/platform-server", "from": "20.3.34", "to": "21.2.25" },
+    { "name": "@angular/router", "from": "20.3.34", "to": "21.2.25" },
+    { "name": "@angular/cli", "from": "^20.3.41", "to": "^21.2.28" },
+    { "name": "@angular-devkit/build-angular", "from": "^20.3.41", "to": "^21.2.28" },
+    { "name": "@angular/compiler-cli", "from": "^20.3.34", "to": "^21.2.25" },
+    { "name": "@angular/language-service", "from": "^20.3.34", "to": "^21.2.25" },
+    { "name": "typescript", "from": "~5.8.3", "to": "~5.9.3" },
+    { "name": "@ngrx/store", "from": "^20.1.0", "to": "^21.1.1" },
+    { "name": "@ngrx/effects", "from": "^20.1.0", "to": "^21.1.1" },
+    { "name": "@ngrx/entity", "from": "^20.1.0", "to": "^21.1.1" },
+    { "name": "@ngrx/router-store", "from": "^20.1.0", "to": "^21.1.1" },
+    { "name": "@ngrx/store-devtools", "from": "^20.1.0", "to": "^21.1.1" }
+  ],
+  "checks": {
+    "install": "pass",
+    "build": "pass",
+    "build:ssr": "pass",
+    "test": "fail (same as baseline)"
+  },
+  "manual_followups": [
+    "Tests still fail exactly as at baseline and for the same reason: the `test` target in angular.json lists the stylesheet as \"styles.css\" instead of \"src/styles.css\", so Karma reports \"Can't resolve 'styles.css'\" and aborts before running any spec. Fixing that one path would let the suite run; left alone here because the hop rules only require that a baseline failure not get worse.",
+    "@angular/animations is now deprecated (npm prints a deprecation warning on install) in favour of `animate.enter`/`animate.leave`, and is slated for removal in Angular 22. The package is still listed as a dependency; check whether anything actually imports it before the next major.",
+    "The app remains NgModule-based (every component explicitly `standalone: false`) on the deprecated `browser`/`server` builders with aspnet-prerendering SSR, bootstrapped via `platformBrowserDynamic`. It still builds on Angular 21, but migrating to the application builder and `bootstrapApplication` is the main piece of debt left, and `provideZoneChangeDetection()` is now explicit in main.ts, so a move to zoneless is a one-line change when wanted.",
+    "rxjs is still ^6.6.7 (end-of-life but inside Angular 21's and NgRx 21's peer ranges). Bump to rxjs 7 before Angular 22.",
+    "Deprecated/legacy devDeps remain unchanged (tslint, codelyzer, protractor, node-sass, core-js 2, @types/node 12, jasmine 3.10, karma). None are exercised by the required checks, but karma is deprecated in favour of the Vitest builder and codelyzer/tslint block a move to ESLint."
+  ]
+}

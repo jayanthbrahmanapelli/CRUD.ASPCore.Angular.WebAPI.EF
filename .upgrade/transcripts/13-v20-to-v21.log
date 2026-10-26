@@ -1,0 +1,11 @@
+Hop 13 (Angular 20 → 21) is done.
+
+**What happened**
+- `ng update @angular/core@21 @angular/cli@21` rewrote `package.json` but its bundled install failed, so install and schematics were run separately.
+- Real blocker the hop file didn't list: `@ngrx/*` 20 pins `@angular/core@^20`. Bumped NgRx to `^21.1.1`; the lockfile also had to be regenerated (npm crashed with `edgesOut` on the stale one).
+- Required migrations: `main.ts` now passes `{ applicationProviders: [provideZoneChangeDetection()] }` (v21 no longer installs zone CD implicitly, so this preserves behaviour), and the three templates using `*ngIf`/`*ngFor` were converted to `@if`/`@for`.
+- TypeScript went `~5.8.3` → `~5.9.3`. rxjs 6 and zone.js are still inside v21's peer ranges, so untouched. `angular.json` unchanged — the `browser`/`server` builders and aspnet-prerendering SSR still work.
+
+**Checks** (from a clean `node_modules`, no npm flags): `npm install` pass, `npm run build` pass, `npm run build:ssr` pass. `npm run test` still fails with the baseline failure — `angular.json`'s test target points at `styles.css` instead of `src/styles.css`, so Karma aborts before any spec runs. That matches `baseline.json` (`test: fail`) and is noted as a follow-up rather than fixed.
+
+Report written to `.upgrade/reports/13-v20-to-v21.json`. No commit made, per the rules.
