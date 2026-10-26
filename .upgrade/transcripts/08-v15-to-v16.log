@@ -1,0 +1,8 @@
+Hop 8 (Angular 15 → 16) is done.
+
+- `ng update @angular/core@16 @angular/cli@16` ran clean; CLI migration touched `angular.json` (server `buildOptimizer: false`).
+- Bumped `@ngrx/*` 15 → 16 via `ng update @ngrx/store@16`.
+- One hand fix: `src/main.server.ts` re-exported `renderModuleFactory`, removed in v16 — it broke `build:ssr`. The v16 server builder injects the platform-server exports itself, so the file now exports `AppServerModule`.
+- `npm install` pass, `npm run build` pass, `npm run build:ssr` pass. `npm run test` still fails with the identical pre-existing error (`Can't resolve 'styles.css'` from the `test` target's style path) — failing at baseline, not worse.
+
+Report written to `.upgrade/reports/08-v15-to-v16.json`. No commit made, per the rules.
