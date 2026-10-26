@@ -1,0 +1,14 @@
+Hop 3 is done: Angular 10.2 → 11.2.
+
+**What changed**
+- `ng update @angular/core@11 @angular/cli@11` ran all v11 migrations. Source effects: the three component specs moved from `async` to `waitForAsync`, and `RouterModule.forRoot` now pins `{ relativeLinkResolution: 'legacy' }` so routing behaviour is unchanged.
+- `angular.json`: `extractCss` removed from both the base and `production` build options (no longer a valid option in v11).
+- NgRx 10.1.2 → 11.1.1 via `ng update @ngrx/store@11` (NgRx 10 peers only with Angular 10); no NgRx source migrations needed.
+- Tooling moved to the v11 baselines (karma 6.4, jasmine-core/@types/jasmine 3.6). TypeScript stays at 4.0.8, which v11 supports.
+
+**Checks**
+- `npm install` — pass (verified with a clean `rm -rf node_modules`)
+- `npm run build` — pass
+- `npm test` — fails, identically to baseline: angular.json's karma target lists `"styles": ["styles.css"]` instead of `"src/styles.css"`, so the builder ENOENTs before running anything. Pre-existing, not a regression.
+
+Report written to `.upgrade/reports/03-v10-to-v11.json`. One followup is worth flagging early: `@nguniversal/module-map-ngfactory-loader` is still pinned at 7.1.0 with incompatible peers — it's obsolete under Ivy and will become a hard blocker at whichever hop needs a real `@nguniversal` bump.

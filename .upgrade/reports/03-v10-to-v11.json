@@ -1,0 +1,46 @@
+{
+  "hop": "03-v10-to-v11",
+  "status": "done",
+  "summary": "Upgraded the ClientApp from Angular 10.2 to Angular 11.2 with `ng update @angular/core@11 @angular/cli@11`, which ran all of Angular's v11 migrations (waitForAsync rename in the specs, explicit `relativeLinkResolution: 'legacy'` on RouterModule.forRoot, removal of the dropped `extractCss` builder option) and moved the karma/jasmine tooling to their v11 baselines. NgRx was bumped 10.1 -> 11.1 because NgRx 10 peers only with Angular 10. `npm install` and `npm run build` pass; `npm test` still fails for the same pre-existing angular.json misconfiguration it failed with at baseline.",
+  "changes": [
+    "Ran `ng update @angular/core@11 @angular/cli@11 --allow-dirty --force`; all v11 migrations ran (AbstractControl.parent non-null, ViewEncapsulation.Native, NavigationExtras omissions/preserveQueryParams, RouterModule initialNavigation, relativeLinkResolution, async -> waitForAsync, canActivate+redirectTo).",
+    "angular.json: the v11 migration removed the now-invalid `extractCss` option from both the base build options and the `production` configuration (CSS extraction is unconditional in v11).",
+    "src/app/app.module.ts: `RouterModule.forRoot(...)` now passes `{ relativeLinkResolution: 'legacy' }` explicitly, pinning the pre-v11 behaviour so routing is unchanged.",
+    "The three component specs (add-employee, counter, fetch-employee) now import and use `waitForAsync` instead of the deprecated `async` testing helper.",
+    "Ran `ng update @ngrx/store@11`, moving all five @ngrx packages from 10.1.2 to 11.1.1 (NgRx 10 peer-restricts @angular/core to ^10.0.0); no NgRx source migrations were needed.",
+    "TypeScript stays at 4.0.8, which Angular 11 supports; no TS bump was required this hop.",
+    "package-lock.json regenerated through npm; verified with a clean `rm -rf node_modules && npm install` (exit 0) followed by a passing `npm run build` (exit 0)."
+  ],
+  "dependencies": [
+    { "name": "@angular/animations", "from": "10.2.5", "to": "11.2.14" },
+    { "name": "@angular/common", "from": "10.2.5", "to": "11.2.14" },
+    { "name": "@angular/compiler", "from": "10.2.5", "to": "11.2.14" },
+    { "name": "@angular/core", "from": "10.2.5", "to": "11.2.14" },
+    { "name": "@angular/forms", "from": "10.2.5", "to": "11.2.14" },
+    { "name": "@angular/platform-browser", "from": "10.2.5", "to": "11.2.14" },
+    { "name": "@angular/platform-browser-dynamic", "from": "10.2.5", "to": "11.2.14" },
+    { "name": "@angular/platform-server", "from": "10.2.5", "to": "11.2.14" },
+    { "name": "@angular/router", "from": "10.2.5", "to": "11.2.14" },
+    { "name": "@angular/compiler-cli", "from": "^10.2.5", "to": "^11.2.14" },
+    { "name": "@angular/language-service", "from": "^10.2.5", "to": "^11.2.14" },
+    { "name": "@angular/cli", "from": "~10.2.4", "to": "~11.2.19" },
+    { "name": "@angular-devkit/build-angular", "from": "~0.1002.4", "to": "~0.1102.19" },
+    { "name": "@ngrx/store", "from": "^10.1.2", "to": "^11.1.1" },
+    { "name": "@ngrx/effects", "from": "^10.1.2", "to": "^11.1.1" },
+    { "name": "@ngrx/entity", "from": "^10.1.2", "to": "^11.1.1" },
+    { "name": "@ngrx/router-store", "from": "^10.1.2", "to": "^11.1.1" },
+    { "name": "@ngrx/store-devtools", "from": "^10.1.2", "to": "^11.1.1" },
+    { "name": "karma", "from": "~5.0.0", "to": "~6.4.4" },
+    { "name": "jasmine-core", "from": "~3.5.0", "to": "~3.6.0" },
+    { "name": "@types/jasmine", "from": "~3.3.9", "to": "~3.6.0" },
+    { "name": "codelyzer", "from": "^6.0.2", "to": "^6.0.0" }
+  ],
+  "manual_followups": [
+    "`npm test` fails at baseline and still fails with the identical cause: the karma target in angular.json lists `\"styles\": [\"styles.css\"]` instead of `\"src/styles.css\"`, so the builder cannot resolve the entry (ENOENT on ClientApp/styles.css). Pre-existing, not a regression; worth fixing so the suite can actually run.",
+    "@nguniversal/module-map-ngfactory-loader is still pinned at 7.1.0 and warns about incompatible @angular/{common,core,platform-server} peers. With Ivy the ModuleMapLoaderModule is obsolete; src/app/app.server.module.ts should drop it and the package should be removed. This will become a hard blocker at the hop that needs a real @nguniversal bump.",
+    "The build still emits `src/main.ts depends on '@angular/platform-server'. CommonJS or AMD dependencies can cause optimization bailouts.` Harmless; silenceable via `allowedCommonJsDependencies`.",
+    "node-sass 4.11 (an optionalDependency) still fails to compile on this Node 12 / Python 3 image and is skipped. Nothing in the build uses Sass, so it blocks nothing, but it should be removed or replaced with `sass`.",
+    "`ng update` had to be run with NG_DISABLE_VERSION_CHECK=1 from a CLI 11 install in /tmp: without it the local CLI fetches the latest stable CLI, which refuses to run on Node 12.",
+    "`ng update` relaxed codelyzer from ^6.0.2 to ^6.0.0; the lockfile still resolves 6.0.2, so this is cosmetic. codelyzer/tslint are deprecated and should be replaced with ESLint in a later hop."
+  ]
+}

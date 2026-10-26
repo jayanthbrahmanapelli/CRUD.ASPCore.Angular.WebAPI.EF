@@ -41,13 +41,13 @@ import * as fromEmployee from 'src/app/state/reducers/employee.reducer';
       maxAge: 25
     }),
     RouterModule.forRoot([
-      { path: '', component: HomeComponent, pathMatch: 'full' },
-      { path: 'counter', component: CounterComponent },
-      { path: 'fetch-data', component: FetchDataComponent },
-      { path: 'fetch-employee', component: FetchEmployeeComponent },
-      { path: 'register-employee', component: AddEmployeeComponent },
-      { path: 'employee/edit/:id', component: AddEmployeeComponent },
-    ])
+    { path: '', component: HomeComponent, pathMatch: 'full' },
+    { path: 'counter', component: CounterComponent },
+    { path: 'fetch-data', component: FetchDataComponent },
+    { path: 'fetch-employee', component: FetchEmployeeComponent },
+    { path: 'register-employee', component: AddEmployeeComponent },
+    { path: 'employee/edit/:id', component: AddEmployeeComponent },
+], { relativeLinkResolution: 'legacy' })
   ],
   providers: [],
   bootstrap: [AppComponent]
