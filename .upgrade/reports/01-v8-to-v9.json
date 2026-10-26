@@ -1,0 +1,42 @@
+{
+  "hop": "01-v8-to-v9",
+  "status": "done",
+  "summary": "Upgraded EFNgApp/EFNgApp/ClientApp from Angular 8.1 to Angular 9.1 using `ng update @angular/core@9 @angular/cli@9`, which also bumped TypeScript to 3.8, zone.js to 0.10, rxjs to 6.6 and applied the CLI's own migrations (Ivy/AOT by default, tsconfig files/include rewrites, anyComponentStyle budget, platform-server re-export in main.ts for the server build). @ngrx/* was moved from 8.6 to 9.2 to match Angular 9; its v9 migration schematics reported nothing to change because the app uses neither StoreRouterConnectingModule nor the renamed effects config keys. install and build pass; the test suite still fails, as it did at baseline, but it now actually runs (2 pass / 3 fail) instead of dying before the first spec.",
+  "changes": [
+    "ng update migrated the app to Angular 9.1.13 with Ivy enabled by default.",
+    "angular.json: CLI migration added \"aot\": true to the browser build and an anyComponentStyle budget to the production configuration.",
+    "src/tsconfig.app.json and src/tsconfig.server.json: CLI migration replaced the exclude list with explicit files/include entries required by Angular 9.",
+    "src/main.ts: CLI universal migration appended `export { renderModule, renderModuleFactory } from '@angular/platform-server'` (the server target uses src/main.ts as its entry).",
+    "angular.json: fixed the karma target's styles entry from \"styles.css\" to \"src/styles.css\". That path has never existed, so `npm run test` failed at webpack resolution before any spec ran; with the fix the suite executes.",
+    "Ran the @ngrx/effects and @ngrx/router-store v9 migration schematics directly (`ng generate <collection>:<schematic>`); both reported \"Nothing to be done\"."
+  ],
+  "dependencies": [
+    { "name": "@angular/animations", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/common", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/compiler", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/core", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/forms", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/platform-browser", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/platform-browser-dynamic", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/platform-server", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/router", "from": "8.1.0", "to": "9.1.13" },
+    { "name": "@angular/cli", "from": "~8.1.0", "to": "~9.1.15" },
+    { "name": "@angular/compiler-cli", "from": "^8.1.0", "to": "^9.1.13" },
+    { "name": "@angular/language-service", "from": "^8.1.0", "to": "^9.1.13" },
+    { "name": "@angular-devkit/build-angular", "from": "~0.801.0", "to": "~0.901.15" },
+    { "name": "typescript", "from": "~3.4.5", "to": "~3.8.3" },
+    { "name": "zone.js", "from": "~0.9.1", "to": "~0.10.2" },
+    { "name": "rxjs", "from": "^6.4.0", "to": "^6.6.7" },
+    { "name": "@ngrx/store", "from": "^8.5.2", "to": "^9.2.1" },
+    { "name": "@ngrx/effects", "from": "^8.5.2", "to": "^9.2.1" },
+    { "name": "@ngrx/entity", "from": "^8.5.2", "to": "^9.2.1" },
+    { "name": "@ngrx/router-store", "from": "^8.5.2", "to": "^9.2.1" },
+    { "name": "@ngrx/store-devtools", "from": "^8.5.2", "to": "^9.2.1" }
+  ],
+  "manual_followups": [
+    "Unit tests still fail (3 of 5). The specs predate this hop and are broken on their own terms: EmployeeService's spec calls TestBed.get(EmployeeService) with an empty testing module (no HttpClient provider, so the async callback times out), and the AddEmployeeComponent/FetchEmployeeComponent specs declare the component with no imports or providers, so creation throws. Fixing them means adding HttpClientTestingModule/store providers to the specs, which is test authoring rather than an upgrade step. Baseline already recorded test: fail.",
+    "`npm run build:ssr` fails with `TS2688: Cannot find type definition file for 'minimatch'`. This is pre-existing, not caused by the hop: tsconfig.json sets typeRoots to node_modules/@types without a `types` override in tsconfig.server.json, and the transitively installed @types/minimatch@6 is a stub package with no .d.ts. The browser build is unaffected because tsconfig.app.json sets \"types\": []. Fix by pinning @types/minimatch or adding an explicit \"types\" list to tsconfig.server.json.",
+    "@nguniversal/module-map-ngfactory-loader is still at 7.1.0 and declares Angular ^7 peers. It is redundant under Ivy and was dropped in later Angular Universal releases; consider removing ModuleMapLoaderModule from src/app/app.server.module.ts in a follow-up. It was left in place here because the hop's required checks pass with it and removing it is a behaviour-affecting change to SSR.",
+    "node-sass@4.11.0 cannot build on this Node 12 image (node-gyp 3.8 + Python 3). It is an optionalDependency and npm skips it, matching baseline, but anyone compiling .scss locally will need a newer sass package."
+  ]
+}

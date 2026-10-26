@@ -1,0 +1,16 @@
+Hop done.
+
+**What happened**
+- `ng update @angular/core@9 @angular/cli@9` ran clean and applied Angular's own migrations: Angular 9.1.13, CLI/devkit 9.1, TypeScript 3.8, zone.js 0.10, rxjs 6.6, Ivy+AOT on by default, tsconfig `files`/`include` rewrites, `anyComponentStyle` budget, and the platform-server re-export in `src/main.ts`.
+- The hop file said "none detected" for related packages, but `@ngrx/*` 8.6 declares Angular ^8 peers, so I moved all five ngrx packages to 9.2.1 via npm (the CLI's `ng update` path for them is blocked on this image — CLI 9 tries to fetch the latest stable CLI, which demands Node 22+). I ran the ngrx v9 migration schematics directly instead; both relevant ones reported nothing to change, which matches the code: the app uses neither `StoreRouterConnectingModule` nor `resubscribeOnError`.
+
+**Checks** (from `ClientApp`, Node 12)
+- `npm install` — pass
+- `npm run build` — pass
+- `npm run test -- --watch=false --browsers=ChromeHeadless` — fail, as at baseline
+
+One thing worth your attention: the karma target in `angular.json` pointed at `styles.css` at the project root, a path that doesn't exist, so the test command died at webpack resolution before any spec ran — that's what the baseline `"test": "fail"` actually was. I corrected it to `src/styles.css`. The suite now runs: 2 pass, 3 fail. The 3 failures are pre-existing spec defects (empty `TestBed` with no `HttpClient` provider), not upgrade fallout; I left them alone rather than rewriting tests inside an upgrade hop, and wrote them up as followups.
+
+`npm run build:ssr` also fails (`TS2688` on a stubbed `@types/minimatch`), but it's pre-existing and not a required check — details and the fix are in the report's followups, along with the still-stale `@nguniversal/module-map-ngfactory-loader`.
+
+Report written to `.upgrade/reports/01-v8-to-v9.json` with `"status": "done"`. No commits made.
