@@ -1,0 +1,10 @@
+Hop 4 complete. Angular 11.2.14 → 12.2.17.
+
+**Checks (Node 14):**
+- `npm install` — pass (clean `rm -rf node_modules` install, exit 0)
+- `npm run build` — pass
+- `npm test` — fail, identical to baseline: `ENOENT ... ClientApp/styles.css` from the karma target's `"styles": ["styles.css"]` typo. Pre-existing, not a regression.
+
+**What changed:** `ng update @angular/core@12 @angular/cli@12` ran all v12 migrations — zone.js moved to 0.11 with the new import paths (`zone.js`, `zone.js/testing`, `zone.js/plugins/zone-error`), `emitDecoratorMetadata` dropped from tsconfig, and angular.json cleaned of options v12 no longer accepts (`aot`) with the previously-implicit dev settings made explicit plus `defaultConfiguration: ""` to preserve the old non-production default. TypeScript went 4.0.8 → 4.3.5 (v12 requires ≥4.2) with no source fallout. NgRx needed its own bump to 12.5.1 since NgRx 11 peers only with Angular 11.
+
+Report written to `.upgrade/reports/04-v11-to-v12.json`, with the carried-forward follow-ups (karma styles path, the obsolete `@nguniversal/module-map-ngfactory-loader@7.1.0` that will block a future hop, node-sass, tslint/codelyzer). No files touched outside `ClientApp`; no commits made.

@@ -1,0 +1,48 @@
+{
+  "hop": "04-v11-to-v12",
+  "status": "done",
+  "summary": "Upgraded the ClientApp from Angular 11.2 to Angular 12.2 with `ng update @angular/core@12 @angular/cli@12`, which ran all of Angular's v12 migrations (zone.js 0.11 import paths, removal of deprecated angular.json options, drop of emitDecoratorMetadata, lazy-loading/i18n/web-worker/XhrFactory/ActivatedRouteSnapshot.fragment checks) and moved TypeScript to 4.3.5. NgRx was bumped 11.1 -> 12.5 because NgRx 11 peers only with Angular 11. A clean `npm install` and `npm run build` both pass; `npm test` still fails for the same pre-existing angular.json misconfiguration it failed with at baseline.",
+  "changes": [
+    "Ran `ng update @angular/core@12 @angular/cli@12 --allow-dirty --force`; all v12 migrations executed (deprecated angular.json options removed, zone.js 0.11 update, emitDecoratorMetadata removal, lazy loading syntax, ViewEngine i18n options, Web Worker syntax, skipTests schematic option, --prod in scripts, ActivatedRouteSnapshot.fragment nullability, XhrFactory move, /deep/ -> ::ng-deep).",
+    "angular.json: the CLI migration dropped the now-default `aot` option from the browser builder base options and the production configuration, made the previously implicit development settings explicit on the base options (`optimization: false`, `sourceMap: true`, `buildOptimizer: false`, `vendorChunk: true`, `namedChunks: true`, `extractLicenses: false`) and on the server builder (`sourceMap: true`, `optimization: false`), and added `defaultConfiguration: \"\"` to the build and server targets so `ng build`/`ng run EFNgApp:server:dev` keep their pre-v12 (non-production-by-default) behaviour.",
+    "src/polyfills.ts: `import 'zone.js/dist/zone'` -> `import 'zone.js'` for the zone.js 0.11 entry-point layout.",
+    "src/test.ts: `zone.js/dist/zone-testing` -> `zone.js/testing`.",
+    "src/environments/environment.ts: commented-out `zone.js/dist/zone-error` import updated to `zone.js/plugins/zone-error`.",
+    "tsconfig.json: `emitDecoratorMetadata` removed; Ivy no longer needs it and v12 flags it as unnecessary.",
+    "Ran `ng update @ngrx/store@12`, moving all five @ngrx packages from 11.1.1 to 12.5.1 (NgRx 11 peer-restricts @angular/core to ^11.0.0); no NgRx source migrations were needed.",
+    "TypeScript moved 4.0.8 -> 4.3.5 by the CLI update (Angular 12 requires TS >= 4.2); no source changes were needed for the stricter compiler.",
+    "package-lock.json regenerated through npm; verified with a clean `rm -rf node_modules && npm install` (exit 0) followed by a passing `npm run build` (exit 0) on Node 14."
+  ],
+  "dependencies": [
+    { "name": "@angular/animations", "from": "11.2.14", "to": "12.2.17" },
+    { "name": "@angular/common", "from": "11.2.14", "to": "12.2.17" },
+    { "name": "@angular/compiler", "from": "11.2.14", "to": "12.2.17" },
+    { "name": "@angular/core", "from": "11.2.14", "to": "12.2.17" },
+    { "name": "@angular/forms", "from": "11.2.14", "to": "12.2.17" },
+    { "name": "@angular/platform-browser", "from": "11.2.14", "to": "12.2.17" },
+    { "name": "@angular/platform-browser-dynamic", "from": "11.2.14", "to": "12.2.17" },
+    { "name": "@angular/platform-server", "from": "11.2.14", "to": "12.2.17" },
+    { "name": "@angular/router", "from": "11.2.14", "to": "12.2.17" },
+    { "name": "@angular/compiler-cli", "from": "^11.2.14", "to": "^12.2.17" },
+    { "name": "@angular/language-service", "from": "^11.2.14", "to": "^12.2.17" },
+    { "name": "@angular/cli", "from": "~11.2.19", "to": "~12.2.18" },
+    { "name": "@angular-devkit/build-angular", "from": "~0.1102.19", "to": "~12.2.18" },
+    { "name": "@ngrx/store", "from": "^11.1.1", "to": "^12.5.1" },
+    { "name": "@ngrx/effects", "from": "^11.1.1", "to": "^12.5.1" },
+    { "name": "@ngrx/entity", "from": "^11.1.1", "to": "^12.5.1" },
+    { "name": "@ngrx/router-store", "from": "^11.1.1", "to": "^12.5.1" },
+    { "name": "@ngrx/store-devtools", "from": "^11.1.1", "to": "^12.5.1" },
+    { "name": "zone.js", "from": "~0.10.2", "to": "~0.11.4" },
+    { "name": "typescript", "from": "~4.0.8", "to": "~4.3.5" }
+  ],
+  "manual_followups": [
+    "`npm test` fails at baseline and still fails with the identical cause: the karma target in angular.json lists `\"styles\": [\"styles.css\"]` instead of `\"src/styles.css\"`, so the builder cannot resolve the entry (ENOENT on ClientApp/styles.css). Pre-existing, not a regression; worth fixing so the suite can actually run.",
+    "@nguniversal/module-map-ngfactory-loader is still pinned at 7.1.0 and warns about incompatible @angular/{common,core,platform-server} peers. With Ivy the ModuleMapLoaderModule is obsolete; src/app/app.server.module.ts should drop it and the package should be removed. This will become a hard blocker at the hop that needs a real @nguniversal bump.",
+    "The build still emits `src/main.ts depends on '@angular/platform-server'. CommonJS or AMD dependencies can cause optimization bailouts.` Harmless; silenceable via `allowedCommonJsDependencies`.",
+    "node-sass 4.11 (an optionalDependency) still fails to compile on this Node 14 image and is skipped. Nothing in the build uses Sass, so it blocks nothing, but it should be removed or replaced with `sass`.",
+    "`ng update` had to be run from a standalone CLI 12 install in /tmp with NG_DISABLE_VERSION_CHECK=1; `npx -p @angular/cli@12 ng ...` misparses on npm 6 and the local CLI otherwise fetches a CLI too new for Node 14.",
+    "The v12 migration left `\"defaultConfiguration\": \"\"` on the build and server targets. It is schema-valid and preserves the old default (no configuration applied), but a person may want to set it to `production` / `dev` deliberately.",
+    "IE11 support is deprecated in v12 and `browserslist`/differential loading still produce ES5 bundles; dropping the ES5 pass would speed the build but changes output, so it was left alone.",
+    "codelyzer/tslint are still present and deprecated; they should be replaced with ESLint in a later hop."
+  ]
+}
